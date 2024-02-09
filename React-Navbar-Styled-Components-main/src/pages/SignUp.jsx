@@ -1,113 +1,82 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import React, { useState } from 'react';
+import Axios from 'axios';
 
-const SignUpContainer = styled.div`
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  border-radius: 8px;
-`;
+function Signup() {
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState(''); // Assuming you have a username field in your database.
+  const [password, setPassword] = useState('');
 
-const Title = styled.h2`
-  color: #333;
-  margin-bottom: 20px;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 20px;
-`;
-
-const Label = styled.label`
-  color: #555;
-  margin-bottom: 8px;
-  display: block;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const SignUpButton = styled.button`
-  background-color: #007bff;
-  color: #fff;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
-export const SignUp = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: ""
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Perform sign-up logic with formData
-    console.log("Sign-up data:", formData);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      // Update the URL to match the endpoint provided by your Express server.
+      const response = await Axios.post('http://localhost:5000/register', {
+        email,
+        username, // Make sure your backend handles the username as well.
+        password
+      });
+      // Handle response here. E.g., set user context, redirect, etc.
+      alert('Registration successful!');
+    } catch (error) {
+      // Handle error here. E.g., show error message to user.
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        alert(error.response.data.message);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+    }
   };
 
   return (
-    <SignUpContainer>
-      <Title>Sign Up</Title>
-      <Form onSubmit={handleSubmit}>
-        <FormGroup>
-          <Label htmlFor="username">Username:</Label>
-          <Input
+    <div className="container">
+      <div className="signupForm">
+        <h4>Register Here</h4>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="email">Email Address</label>
+          <input
+            className="textInput"
             type="text"
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label htmlFor="email">Email:</Label>
-          <Input
-            type="email"
-            id="email"
             name="email"
-            value={formData.email}
-            onChange={handleChange}
+            placeholder="Enter your Email Address"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
-        </FormGroup>
-        <FormGroup>
-          <Label htmlFor="password">Password:</Label>
-          <Input
+          <label htmlFor="username">Username</label>
+          <input
+            className="textInput"
+            type="text"
+            name="username"
+            placeholder="Enter your Username"
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <label htmlFor="password">Password</label>
+          <input
+            className="textInput"
             type="password"
-            id="password"
             name="password"
-            value={formData.password}
-            onChange={handleChange}
+            placeholder="Enter your Password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
-        </FormGroup>
-        <SignUpButton type="submit">Sign Up</SignUpButton>
-      </Form>
-    </SignUpContainer>
+          <input
+            className="button"
+            type="submit"
+            value="Create an account"
+          />
+        </form>
+      </div>
+    </div>
   );
-};
+}
+
+export default Signup;
