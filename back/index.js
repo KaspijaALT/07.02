@@ -75,3 +75,34 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+app.post('/login', async (req, res) => {
+  const { email, username, password } = req.body;
+
+  // Using prepared statements to prevent SQL injection
+  const query = 'SELECT * FROM users WHERE email = ? AND username = ?';
+  try {
+    const [rows] = await db.promise().execute(query, [email, username]);
+    const user = rows[0];
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    // Assuming 'password' is the column where you store the hashed passwords
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (isPasswordMatch) {
+      // Passwords match
+      res.json({ message: 'Login successful' });
+      // Here, handle the creation of session or token as per your auth strategy
+    } else {
+      // Passwords don't match
+      res.status(401).json({ message: 'Incorrect username or password' });
+    }
+  } catch (error) {
+    console.error('Database query error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+

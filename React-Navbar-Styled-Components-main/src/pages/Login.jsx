@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import Axios from 'axios';
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from 'react-router-dom';
 
-function Signup() {
+function Login() {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  // Direct image URL in the backgroundStyle
   const backgroundStyle = {
-    backgroundImage: `url('https://ogroup.com/wp-content/uploads/2023/10/22-Old-Ranch-Road-115-1.jpg')`,
+    backgroundImage: "url('https://ogroup.com/wp-content/uploads/2023/10/22-Old-Ranch-Road-115-1.jpg')",
     backgroundSize: 'cover',
     backgroundPosition: 'center center',
     height: '100vh',
@@ -21,19 +21,24 @@ function Signup() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await Axios.post('http://localhost:5000/register', {
-        email,
-        username,
+      const response = await Axios.post('http://localhost:5000/login', {
+        email, // Assuming your backend expects email
+        username, // Assuming your backend expects username
         password
       });
-      alert('Registration successful!');
+      // If the server response includes success
+      console.log(response.data); // Log the server response
+      navigate('/dashboard'); // Navigate to dashboard on success
     } catch (error) {
       if (error.response) {
-        alert(error.response.data.message);
+        // Handle errors from server response
+        alert(`Login failed: ${error.response.data.message}`);
       } else if (error.request) {
-        console.log(error.request);
+        // The request was made but no response was received
+        console.log('Login failed: No response received', error.request);
       } else {
-        console.log('Error', error.message);
+        // Something else caused the request to fail
+        console.log('Login error:', error.message);
       }
     }
   };
@@ -41,7 +46,7 @@ function Signup() {
   return (
     <div style={backgroundStyle}>
       <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto', padding: '20px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-        <h2 style={{ textAlign: 'center', margin: '0 0 20px' }}>Register</h2>
+        <h2 style={{ textAlign: 'center', margin: '0 0 20px' }}>Login</h2>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
           <input
             style={{ margin: '10px 0', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
@@ -74,15 +79,16 @@ function Signup() {
             type="submit"
             style={{ padding: '10px', borderRadius: '4px', border: 'none', backgroundColor: 'black', color: 'white', cursor: 'pointer', margin: '20px 0' }}
           >
-            Create Account
+            Login
           </button>
         </form>
         <div style={{ textAlign: 'center' }}>
-          <a href="/Login" style={{ textDecoration: 'none', color: 'blue' }}>Have an account? Login</a>
+          {/* Use Link from react-router-dom instead of <a href> for internal routing */}
+          <Link to="/signup" style={{ textDecoration: 'none', color: 'blue' }}>Don't have an account? Sign Up</Link>
         </div>
       </div>
     </div>
   );
 }
 
-export default Signup;
+export default Login;
